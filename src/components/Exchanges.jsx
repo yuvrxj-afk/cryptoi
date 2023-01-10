@@ -10,20 +10,29 @@ import {
   Text,
 } from "@chakra-ui/react";
 import Loader from "./Loader";
+import ErrorC from "./ErrorC";
 
 const Exchanges = () => {
   const [exchanges, setExchanges] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchExchanges = async () => {
-      const { data } = await axios.get(`${server}/exchanges`);
-      setExchanges(data);
-      console.log(data);
-      setLoading(false);
+      try {
+        const { data } = await axios.get(`${server}/exchanges`);
+        setExchanges(data);
+        setLoading(false);
+      } catch (error) {
+        alert("Error occured!");
+        setLoading(false);
+        setError(true);
+      }
     };
     fetchExchanges();
   }, []);
+
+  if (error) return <ErrorC />;
 
   return (
     <Container maxW={"container.xl"}>
@@ -38,7 +47,7 @@ const Exchanges = () => {
                 img={i.image}
                 url={i.url}
                 key={i.id}
-                rank={i.trust_score_rank}
+                // rank={i.trust_score_rank}
               />
             ))}
           </HStack>
@@ -58,7 +67,7 @@ const ExchangeCard = ({ name, img, rank, url }) => (
       transition={"all 0.3s"}
       m={"4"}
       css={{
-        "&::hover": {
+        "&:hover": {
           transform: "scale(1.1)",
         },
       }}
